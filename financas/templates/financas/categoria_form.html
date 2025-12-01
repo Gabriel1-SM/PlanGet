@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if editar %}Editar{% else %}Nova{% endif %} Categoria - PlanGet{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{% if editar %}Editar{% else %}Nova{% endif %} Categoria</h4>
+                    <a href="{% url 'listar_categorias' %}" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.nome.id_for_label }}" class="form-label">Nome da Categoria</label>
+                            {{ form.nome }}
+                            {% if form.nome.errors %}
+                                <div class="text-danger small">{{ form.nome.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo</label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="text-danger small">{{ form.tipo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.cor.id_for_label }}" class="form-label">Cor</label>
+                            {{ form.cor }}
+                            {% if form.cor.errors %}
+                                <div class="text-danger small">{{ form.cor.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i>
+                                {% if editar %}Atualizar{% else %}Criar{% endif %} Categoria
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

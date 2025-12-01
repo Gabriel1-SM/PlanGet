@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PlanGet</title>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* ===== VARIÁVEIS CSS ===== */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #4895ef;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
+            --header-height: 70px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== RESET E BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .loading-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .logo-text {
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+        }
+
+        .nav {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+            margin: 0.25rem 0.75rem;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: var(--border-radius);
+        }
+
+        .nav-link i {
+            font-size: 1.2rem;
+            margin-right: 0.75rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sidebar.collapsed .user-details {
+            opacity: 0;
+        }
+
+        .logout-btn {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== OVERLAY MOBILE ===== */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* ===== TOP NAV MOBILE ===== */
+        .mobile-nav {
+            display: none;
+            background: white;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            margin-right: 1rem;
+            color: var(--gray-700);
+        }
+
+        .mobile-logo {
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .mobile-logo i {
+            margin-right: 0.5rem;
+        }
+
+        .nav-right {
+            margin-left: auto;
+        }
+
+        .user-menu-btn {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .user-avatar-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-200);
+        }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 1000;
+            display: none;
+            min-width: 200px;
+            padding: 0.5rem 0;
+            margin: 0.125rem 0 0;
+            font-size: 0.875rem;
+            color: var(--gray-800);
+            text-align: left;
+            list-style: none;
+            background-color: white;
+            background-clip: padding-box;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 1rem;
+            clear: both;
+            font-weight: 400;
+            color: var(--gray-800);
+            text-align: inherit;
+            text-decoration: none;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .dropdown-divider {
+            height: 0;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #3ab0d4;
+            border-color: #3ab0d4;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #e1156d;
+            border-color: #e1156d;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .dropdown-toggle::after {
+            display: inline-block;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            content: "";
+            border-top: 0.3em solid;
+            border-right: 0.3em solid transparent;
+            border-bottom: 0;
+            border-left: 0.3em solid transparent;
+        }
+
+        /* ===== CARDS DE RESUMO ===== */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .summary-card {
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            background: var(--gray-100);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .summary-card.saldo {
+            border-left-color: var(--primary);
+        }
+
+        .summary-card.receitas {
+            border-left-color: var(--success);
+        }
+
+        .summary-card.despesas {
+            border-left-color: var(--danger);
+        }
+
+        .summary-card.investimentos {
+            border-left-color: var(--warning);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .summary-card.saldo .card-icon {
+            background: var(--primary);
+        }
+
+        .summary-card.receitas .card-icon {
+            background: var(--success);
+        }
+
+        .summary-card.despesas .card-icon {
+            background: var(--danger);
+        }
+
+        .summary-card.investimentos .card-icon {
+            background: var(--warning);
+        }
+
+        .card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .card-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .card-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+
+        /* ===== GRÁFICOS ===== */
+        .charts-section {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* ===== TABELA DE TRANSAÇÕES ===== */
+        .content-wrapper {
+            padding: 2rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        .table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-group-sm {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-check {
+            display: none;
+        }
+
+        .btn-check:checked + .btn-outline-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: var(--gray-100);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+
+        .category-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .table-actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+
+        .action-btn.edit:hover {
+            color: var(--primary);
+        }
+
+        .action-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        /* ===== WIDGETS ===== */
+        .widgets-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .widget {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .widget-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .list-group {
+            list-style: none;
+        }
+
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info h6 {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .item-info small {
+            color: var(--gray-600);
+        }
+
+        .item-value {
+            font-weight: 600;
+        }
+
+        .item-value.positive {
+            color: var(--success);
+        }
+
+        .item-value.negative {
+            color: var(--danger);
+        }
+
+        .progress-container {
+            margin: 1rem 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .bg-success { background-color: var(--success) !important; }
+        .bg-info { background-color: var(--info) !important; }
+        .bg-warning { background-color: var(--warning) !important; }
+        .bg-primary { background-color: var(--primary) !important; }
+        .bg-danger { background-color: var(--danger) !important; }
+        .bg-secondary { background-color: var(--secondary) !important; }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb-nav {
+            padding: 0;
+        }
+
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            list-style: none;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "/";
+            padding: 0 0.5rem;
+            color: var(--gray-600);
+        }
+
+        .breadcrumb-item a {
+            color: var(--gray-600);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--gray-800);
+        }
+
+        /* ===== FOOTER ===== */
+        .main-footer {
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 1.5rem 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        /* ===== BOTÕES FLUTUANTES ===== */
+        .floating-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+        }
+
+        .btn-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-floating {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-floating:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.collapsed {
+                transform: translateX(0);
+                width: var(--sidebar-width);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .main-content.expanded {
+                margin-left: 0;
+            }
+            
+            .mobile-nav {
+                display: flex;
+            }
+            
+            .sidebar-overlay {
+                display: block;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+            
+            .sidebar.collapsed + .sidebar-overlay {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .widgets-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .charts-section {
+                padding: 1rem;
+            }
+            
+            .content-wrapper {
+                padding: 1rem;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .floating-actions {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .btn-floating {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+        }
+
+        /* ===== UTILITÁRIOS ===== */
+        .d-none {
+            display: none !important;
+        }
+
+        .d-md-inline {
+            display: none !important;
+        }
+
+        @media (min-width: 768px) {
+            .d-md-inline {
+                display: inline !important;
+            }
+        }
+
+        .text-primary { color: var(--primary) !important; }
+        .text-success { color: var(--success) !important; }
+        .text-danger { color: var(--danger) !important; }
+        .text-warning { color: var(--warning) !important; }
+        .text-muted { color: var(--gray-600) !important; }
+
+        .bg-primary { background-color: var(--primary) !important; }
+        .bg-success { background-color: var(--success) !important; }
+        .bg-danger { background-color: var(--danger) !important; }
+        .bg-warning { background-color: var(--warning) !important; }
+
+        .me-2 { margin-right: 0.5rem !important; }
+        .me-3 { margin-right: 1rem !important; }
+        .ms-2 { margin-left: 0.5rem !important; }
+        .mb-0 { margin-bottom: 0 !important; }
+        .mb-1 { margin-bottom: 0.25rem !important; }
+        .mb-3 { margin-bottom: 1rem !important; }
+        .mb-4 { margin-bottom: 1.5rem !important; }
+
+        .p-2 { padding: 0.5rem !important; }
+        .p-3 { padding: 1rem !important; }
+
+        .position-fixed { position: fixed !important; }
+        .top-0 { top: 0 !important; }
+        .end-0 { right: 0 !important; }
+
+        .fw-bold { font-weight: 600 !important; }
+
+        .rounded-circle { border-radius: 50% !important; }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== SEÇÕES DO DASHBOARD ===== */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        /* ===== FORMULÁRIOS ===== */
+        .form-inline {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-600);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* ===== CARDS DE CATEGORIAS ===== */
+        .category-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .category-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .category-type {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            background: var(--gray-100);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+        }
+
+        .category-total {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* ===== CHECKBOXES ===== */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-check-input {
+            margin-right: 0.5rem;
+        }
+
+        /* ===== ALERTAS ===== */
+        .alert {
+            padding: 1rem 1.5rem;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .alert-danger {
+            background-color: rgba(247, 37, 133, 0.1);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .alert-warning {
+            background-color: rgba(248, 150, 30, 0.1);
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Mensagens do Django -->
+    {% if messages %}
+    <div class="container-fluid mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Sidebar para Desktop -->
+    <aside class="sidebar desktop-sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'dashboard' %}" class="logo">
+                <i class="bi bi-wallet2"></i>
+                <span class="logo-text">PlanGet</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <h6 class="nav-section-title">MENU</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-section="visao-geral">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Visão Geral</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_transacoes' %}">
+                            <i class="bi bi-receipt"></i>
+                            <span>Transações</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_categorias' %}">
+                            <i class="bi bi-tags"></i>
+                            <span>Categorias</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-section="relatorios">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h6 class="nav-section-title">CONTA</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" data-section="perfil">
+                            <i class="bi bi-person"></i>
+                            <span>Perfil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sair</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=4361ee&color=fff" alt="Avatar" class="user-avatar">
+                <div class="user-details">
+                    <span class="user-name">{{ user.username }}</span>
+                    <span class="user-email">{{ user.email }}</span>
+                </div>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Overlay para Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Top Navigation para Mobile -->
+        <nav class="top-nav mobile-nav">
+            <div class="nav-left">
+                <button class="nav-toggle" id="mobileNavToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <a href="{% url 'dashboard' %}" class="mobile-logo">
+                    <i class="bi bi-wallet2"></i>
+                    <span>PlanGet</span>
+                </a>
+            </div>
+            <div class="nav-right">
+                <div class="dropdown">
+                    <button class="user-menu-btn" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=4361ee&color=fff" alt="Avatar" class="user-avatar-sm">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" data-section="perfil"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1 id="section-title">Dashboard</h1>
+                    <p class="page-subtitle" id="section-subtitle">Resumo financeiro</p>
+                </div>
+                <div class="header-actions">
+                    <div class="action-buttons" id="section-actions">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-download"></i>
+                            <span class="d-none d-md-inline">Exportar</span>
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="newTransactionDropdown" data-bs-toggle="dropdown">
+                                <i class="bi bi-plus-circle"></i>
+                                <span class="d-none d-md-inline">Nova Transação</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'criar_transacao' %}"><i class="bi bi-arrow-up-circle text-success me-2"></i>Nova Receita</a></li>
+                                <li><a class="dropdown-item" href="{% url 'criar_transacao' %}"><i class="bi bi-arrow-down-circle text-danger me-2"></i>Nova Despesa</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'listar_categorias' %}"><i class="bi bi-tags text-warning me-2"></i>Gerenciar Categorias</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Breadcrumbs -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item active" id="breadcrumb-active">Dashboard</li>
+                </ol>
+            </nav>
+        </header>
+
+        <!-- SEÇÃO: VISÃO GERAL -->
+        <section id="visao-geral" class="dashboard-section active">
+            <!-- Cards de Resumo - COM DADOS REAIS -->
+            <section class="summary-cards">
+                <div class="summary-card saldo">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <span class="card-badge {% if saldo >= 0 %}badge-success{% else %}badge-danger{% endif %}">
+                            {% if saldo >= 0 %}+{% else %}-{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-value">R$ {{ saldo|floatformat:2 }}</div>
+                    <div class="card-label">Saldo Total</div>
+                </div>
+                
+                <div class="summary-card receitas">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="bi bi-arrow-up-circle"></i>
+                        </div>
+                        <span class="card-badge badge-success">+</span>
+                    </div>
+                    <div class="card-value">R$ {{ total_receitas|floatformat:2 }}</div>
+                    <div class="card-label">Receitas do Mês</div>
+                </div>
+                
+                <div class="summary-card despesas">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="bi bi-arrow-down-circle"></i>
+                        </div>
+                        <span class="card-badge badge-danger">-</span>
+                    </div>
+                    <div class="card-value">R$ {{ total_despesas|floatformat:2 }}</div>
+                    <div class="card-label">Despesas do Mês</div>
+                </div>
+            </section>
+
+            <!-- Gráficos -->
+            <section class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Receitas vs Despesas</h3>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="chartPeriodDropdown" data-bs-toggle="dropdown">
+                                Últimos 6 meses
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Últimos 3 meses</a></li>
+                                <li><a class="dropdown-item active" href="#">Últimos 6 meses</a></li>
+                                <li><a class="dropdown-item" href="#">Último ano</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Despesas por Categoria</h3>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="categoryPeriodDropdown" data-bs-toggle="dropdown">
+                                Outubro 2024
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Setembro 2024</a></li>
+                                <li><a class="dropdown-item active" href="#">Outubro 2024</a></li>
+                                <li><a class="dropdown-item" href="#">Todo o ano</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="expenseCategoryChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conteúdo Principal -->
+            <div class="content-wrapper">
+                <!-- Tabela de Transações Recentes - COM DADOS REAIS -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Últimas Transações</h3>
+                        <div class="table-actions">
+                            <div class="btn-group-sm">
+                                <input type="radio" class="btn-check" name="transactionFilter" id="filterAll" checked>
+                                <label class="btn btn-outline-primary" for="filterAll">Todas</label>
+                                
+                                <input type="radio" class="btn-check" name="transactionFilter" id="filterIncome">
+                                <label class="btn btn-outline-primary" for="filterIncome">Receitas</label>
+                                
+                                <input type="radio" class="btn-check" name="transactionFilter" id="filterExpense">
+                                <label class="btn btn-outline-primary" for="filterExpense">Despesas</label>
+                            </div>
+                            <a href="{% url 'listar_transacoes' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-arrow-right"></i>
+                                <span>Ver Todas</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transacao in transacoes %}
+                                <tr>
+                                    <td>{{ transacao.data|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="{% if transacao.categoria.tipo == 'receita' %}bg-success{% else %}bg-danger{% endif %} rounded-circle p-2 me-3">
+                                                <i class="bi {% if transacao.categoria.tipo == 'receita' %}bi-arrow-up-circle{% else %}bi-arrow-down-circle{% endif %} text-white"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ transacao.descricao }}</div>
+                                                <small class="text-muted">{{ transacao.categoria.nome }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="category-badge" style="background-color: {{ transacao.categoria.cor }};">
+                                            {{ transacao.categoria.nome }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if transacao.categoria.tipo == 'receita' %}
+                                            <span class="badge bg-success">Receita</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Despesa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="{% if transacao.categoria.tipo == 'receita' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                        {% if transacao.categoria.tipo == 'receita' %}+{% else %}-{% endif %} R$ {{ transacao.valor }}
+                                    </td>
+                                    <td>
+                                        <div class="table-actions-cell">
+                                            <a href="{% url 'editar_transacao' transacao.id %}" class="action-btn edit" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'excluir_transacao' transacao.id %}" class="action-btn delete" title="Excluir">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="bi bi-receipt display-1 text-muted"></i>
+                                        <h4 class="text-muted mt-3">Nenhuma transação cadastrada</h4>
+                                        <p class="text-muted">Comece criando sua primeira transação!</p>
+                                        <a href="{% url 'criar_transacao' %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i> Criar Primeira Transação
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: RELATÓRIOS -->
+        <section id="relatorios" class="dashboard-section">
+            <div class="content-wrapper">
+                <div class="table-container">
+                    <h3 class="table-title">Relatórios Financeiros</h3>
+                    <p class="text-muted mb-4">Acesse relatórios detalhados sobre suas finanças.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-bar-chart fs-1 text-primary mb-3"></i>
+                                    <h5 class="card-title">Relatório Mensal</h5>
+                                    <p class="card-text">Análise detalhada das suas finanças no mês atual.</p>
+                                    <button class="btn btn-primary">Gerar Relatório</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-pie-chart fs-1 text-success mb-3"></i>
+                                    <h5 class="card-title">Relatório por Categoria</h5>
+                                    <p class="card-text">Distribuição de gastos e receitas por categoria.</p>
+                                    <button class="btn btn-success">Gerar Relatório</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-calendar-range fs-1 text-warning mb-3"></i>
+                                    <h5 class="card-title">Relatório Personalizado</h5>
+                                    <p class="card-text">Relatório com período e filtros personalizados.</p>
+                                    <button class="btn btn-warning">Gerar Relatório</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: PERFIL -->
+        <section id="perfil" class="dashboard-section">
+            <div class="content-wrapper">
+                <div class="table-container">
+                    <h3 class="table-title">Meu Perfil</h3>
+                    <p class="text-muted mb-4">Gerencie suas informações pessoais e preferências.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center mb-4">
+                                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=4361ee&color=fff&size=150" alt="Avatar" class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+                                <button class="btn btn-outline-primary btn-sm">Alterar Foto</button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <form>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nome</label>
+                                        <input type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">E-mail</label>
+                                        <input type="email" class="form-control" value="{{ user.email }}">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Usuário</label>
+                                        <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Data de Cadastro</label>
+                                        <input type="text" class="form-control" value="{{ user.date_joined|date:'d/m/Y' }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Moeda Principal</label>
+                                    <select class="form-control">
+                                        <option selected>Real Brasileiro (R$)</option>
+                                        <option>Dólar Americano ($)</option>
+                                        <option>Euro (€)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Idioma</label>
+                                    <select class="form-control">
+                                        <option selected>Português (Brasil)</option>
+                                        <option>English</option>
+                                        <option>Español</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="copyright">
+                    &copy; 2024 PlanGet. Todos os direitos reservados.
+                </div>
+                <div class="footer-links">
+                    <a href="#" class="text-muted me-3">Termos de Uso</a>
+                    <a href="#" class="text-muted">Política de Privacidade</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Botões Flutuantes -->
+    <div class="floating-actions">
+        <div class="btn-group-vertical">
+            <a href="{% url 'criar_transacao' %}" class="btn btn-primary btn-floating" title="Nova Transação">
+                <i class="bi bi-plus-lg"></i>
+            </a>
+            <a href="{% url 'listar_categorias' %}" class="btn btn-success btn-floating" title="Categorias">
+                <i class="bi bi-tags"></i>
+            </a>
+            <button class="btn btn-info btn-floating" title="Ajuda">
+                <i class="bi bi-question-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Simular carregamento
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 1000);
+
+            // Sidebar Toggle
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileNavToggle = document.getElementById('mobileNavToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                });
+            }
+
+            if (mobileNavToggle) {
+                mobileNavToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('collapsed');
+                });
+            }
+
+            // Navegação entre seções
+            const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            const sections = document.querySelectorAll('.dashboard-section');
+            const sectionTitle = document.getElementById('section-title');
+            const sectionSubtitle = document.getElementById('section-subtitle');
+            const breadcrumbActive = document.getElementById('breadcrumb-active');
+
+            // Mapeamento de títulos e subtítulos para cada seção
+            const sectionTitles = {
+                'visao-geral': { title: 'Dashboard', subtitle: 'Resumo financeiro' },
+                'relatorios': { title: 'Relatórios', subtitle: 'Acesse relatórios detalhados sobre suas finanças' },
+                'perfil': { title: 'Meu Perfil', subtitle: 'Gerencie suas informações pessoais' }
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Atualizar navegação ativa
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Mostrar seção correspondente
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetSection) {
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                    // Atualizar título e breadcrumb
+                    if (sectionTitles[targetSection]) {
+                        sectionTitle.textContent = sectionTitles[targetSection].title;
+                        sectionSubtitle.textContent = sectionTitles[targetSection].subtitle;
+                        breadcrumbActive.textContent = sectionTitles[targetSection].title;
+                    }
+                    
+                    // Fechar sidebar no mobile
+                    if (window.innerWidth <= 1024) {
+                        sidebar.classList.remove('collapsed');
+                    }
+                });
+            });
+
+            // Gráfico de Receitas vs Despesas
+            const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+            const incomeExpenseChart = new Chart(incomeExpenseCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'],
+                    datasets: [
+                        {
+                            label: 'Receitas',
+                            data: [3200, 2900, 3500, 3800, 3300, 3500],
+                            backgroundColor: '#4cc9f0',
+                            borderColor: '#4cc9f0',
+                            borderWidth: 0
+                        },
+                        {
+                            label: 'Despesas',
+                            data: [2100, 2300, 2500, 2200, 2400, 2150],
+                            backgroundColor: '#f72585',
+                            borderColor: '#f72585',
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Pizza - Despesas por Categoria
+            const expenseCategoryCtx = document.getElementById('expenseCategoryChart').getContext('2d');
+            const expenseCategoryChart = new Chart(expenseCategoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Lazer', 'Outros'],
+                    datasets: [{
+                        data: [1200, 350, 280, 90, 150, 80],
+                        backgroundColor: [
+                            '#4361ee',
+                            '#4cc9f0',
+                            '#7209b7',
+                            '#f8961e',
+                            '#f72585',
+                            '#4895ef'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // Filtro de transações
+            const filterButtons = document.querySelectorAll('input[name="transactionFilter"]');
+            filterButtons.forEach(button => {
+                button.addEventListener('change', function() {
+                    // Aqui você implementaria a lógica de filtragem
+                    console.log('Filtro selecionado:', this.id);
+                });
+            });
+
+            // Dropdowns
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            const dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
+    </script>
+</body>
+</html>

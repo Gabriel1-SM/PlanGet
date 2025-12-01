@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Categorias - PlanGet{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Minhas Categorias</h2>
+        <div>
+            <a href="{% url 'criar_categoria' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Nova Categoria
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for categoria in categorias %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">{{ categoria.nome }}</h5>
+                            <span class="badge {% if categoria.tipo == 'receita' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ categoria.get_tipo_display }}
+                            </span>
+                        </div>
+                        <div class="color-indicator" style="background-color: {{ categoria.cor }}; width: 20px; height: 20px; border-radius: 50%;"></div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a href="{% url 'excluir_categoria' categoria.id %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Excluir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-4">
+                <i class="bi bi-tags display-1 text-muted"></i>
+                <h4 class="text-muted mt-3">Nenhuma categoria cadastrada</h4>
+                <p class="text-muted">Crie categorias para organizar suas transações!</p>
+                <a href="{% url 'criar_categoria' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Criar Primeira Categoria
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

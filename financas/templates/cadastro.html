@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - PlanGet</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        /* ============================================================================
+           ESTILOS DA PÁGINA DE CADASTRO
+           ============================================================================ */
+
+        /* Corpo da página - fundo com gradiente */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Container principal */
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            animation: slideIn 0.6s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================================
+           PAINEL ESQUERDO - INFORMAÇÕES
+           ============================================================================ */
+        .login-left {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .main-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .login-left h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features-list {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .features-list div {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .features-list i {
+            margin-right: 12px;
+            font-size: 1.3rem;
+        }
+
+        /* ============================================================================
+           PAINEL DIREITO - FORMULÁRIO
+           ============================================================================ */
+        .login-right {
+            padding: 50px 40px;
+            flex: 1;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .login-right h2 {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        /* ============================================================================
+           BARRA DE PROGRESSO
+           ============================================================================ */
+        .signup-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .signup-progress::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e0e0e0;
+            z-index: 0;
+        }
+
+        .signup-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .signup-step-text {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .signup-step.active .signup-step-circle {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .signup-step.active .signup-step-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .signup-step.completed .signup-step-circle {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .signup-step.completed .signup-step-text {
+            color: #28a745;
+        }
+
+        /* ============================================================================
+           CAMPOS DE INPUT
+           ============================================================================ */
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .input-group {
+            margin-bottom: 5px;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group-text i {
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .input-group .form-control {
+            padding: 11px 15px;
+            border: 2px solid #e0e0e0;
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .input-group .form-control:focus {
+            border-color: #667eea;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .input-group:focus-within .input-group-text {
+            border-color: #667eea;
+        }
+
+        /* Validação */
+        .form-control.is-valid {
+            border-color: #28a745 !important;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .valid-feedback {
+            display: block;
+            color: #28a745;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        /* ============================================================================
+           BOTÃO MOSTRAR/OCULTAR SENHA
+           ============================================================================ */
+        .password-toggle {
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+            padding: 0 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            background-color: #e9ecef;
+        }
+
+        .password-toggle i {
+            color: #667eea;
+        }
+
+        /* ============================================================================
+           INDICADOR DE FORÇA DA SENHA
+           ============================================================================ */
+        .password-strength {
+            margin-top: 10px;
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .password-strength-bar {
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .password-strength-progress {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .password-strength-progress.weak {
+            width: 33%;
+            background-color: #dc3545;
+        }
+
+        .password-strength-progress.medium {
+            width: 66%;
+            background-color: #ffc107;
+        }
+
+        .password-strength-progress.strong {
+            width: 100%;
+            background-color: #28a745;
+        }
+
+        /* ============================================================================
+           TERMOS DE USO
+           ============================================================================ */
+        .terms-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .terms-container .form-check {
+            margin-bottom: 0;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .form-check-label {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .terms-container a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms-container a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============================================================================
+           BOTÃO DE CADASTRO
+           ============================================================================ */
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-login i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            background: linear-gradient(135deg, #999 0%, #666 100%);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ============================================================================
+           LINK PARA LOGIN
+           ============================================================================ */
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .signup-link a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* ============================================================================
+           SPINNER DE LOADING
+           ============================================================================ */
+        .spinner-login {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================================
+           RESPONSIVIDADE - TABLETS E MOBILE
+           ============================================================================ */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .login-left {
+                display: none;
+            }
+            
+            .login-right {
+                padding: 40px 30px;
+                max-height: none;
+            }
+            
+            .login-right h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .login-container {
+                border-radius: 15px;
+            }
+            
+            .login-right {
+                padding: 30px 20px;
+            }
+            
+            .login-right h2 {
+                font-size: 1.4rem;
+            }
+            
+            .subtitle {
+                font-size: 0.85rem;
+            }
+
+            .signup-progress {
+                margin-bottom: 25px;
+            }
+
+            .signup-step-circle {
+                width: 25px;
+                height: 25px;
+                font-size: 0.8rem;
+            }
+
+            .signup-step-text {
+                font-size: 0.7rem;
+            }
+            
+            .input-group .form-control {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+            
+            .btn-login {
+                font-size: 0.95rem;
+                padding: 11px 15px;
+            }
+        }
+
+        /* Scrollbar customizada */
+        .login-right::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .login-right::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .login-right::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .login-right::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        /* Mensagens Django */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
+        .alert-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Painel Esquerdo - Informações -->
+        <div class="login-left">
+            <i class="bi bi-wallet2 main-icon"></i>
+            <h1>PlanGet</h1>
+            <p class="description">Junte-se a milhares de usuários que já transformaram suas finanças!</p>
+            
+            <div class="features-list">
+                <div>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>100% Gratuito para sempre</span>
+                </div>
+                <div>
+                    <i class="bi bi-shield-check"></i>
+                    <span>Seus dados seguros e protegidos</span>
+                </div>
+                <div>
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Controle total das suas finanças</span>
+                </div>
+                <div>
+                    <i class="bi bi-people-fill"></i>
+                    <span>Compartilhe com familiares</span>
+                </div>
+                <div>
+                    <i class="bi bi-phone"></i>
+                    <span>Acesse de qualquer dispositivo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel Direito - Formulário de Cadastro -->
+        <div class="login-right">
+            <h2>Crie sua conta gratuitamente</h2>
+            <p class="subtitle">Preencha os dados abaixo para começar sua jornada financeira</p>
+
+            <!-- Barra de Progresso do Cadastro -->
+            <div class="signup-progress">
+                <div class="signup-step active">
+                    <div class="signup-step-circle">1</div>
+                    <span class="signup-step-text">Dados</span>
+                </div>
+                <div class="signup-step">
+                    <div class="signup-step-circle">2</div>
+                    <span class="signup-step-text">Senha</span>
+                </div>
+                <div class="signup-step">
+                    <div class="signup-step-circle">3</div>
+                    <span class="signup-step-text">Confirmar</span>
+                </div>
+            </div>
+
+            <!-- 🔥 CORREÇÃO: Formulário Django -->
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Mensagens do Django -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                            <i class="bi {% if message.tags == 'success' %}bi-check-circle{% else %}bi-exclamation-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Nome de Usuário (OBRIGATÓRIO para Django) -->
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">
+                        <i class="bi bi-person"></i>
+                        Nome de Usuário *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                            id="id_username" 
+                            name="username" 
+                            placeholder="joaosilva" 
+                            required
+                            value="{{ form.username.value|default:'' }}"
+                        >
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.username.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Senha 1 (OBRIGATÓRIA para Django) -->
+                <div class="mb-3">
+                    <label for="id_password1" class="form-label">
+                        <i class="bi bi-lock"></i>
+                        Senha *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input 
+                            type="password" 
+                            class="form-control {% if form.password1.errors %}is-invalid{% endif %}" 
+                            id="id_password1" 
+                            name="password1" 
+                            placeholder="Mínimo 8 caracteres" 
+                            required
+                        >
+                        <button type="button" class="password-toggle" id="togglePassword1">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password1.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password1.errors.0 }}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Indicador de Força da Senha -->
+                    <div class="password-strength mt-2">
+                        <div class="password-strength-text" id="strengthText">Digite uma senha</div>
+                        <div class="password-strength-bar">
+                            <div class="password-strength-progress" id="strengthBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Senha 2 - Confirmação (OBRIGATÓRIA para Django) -->
+                <div class="mb-3">
+                    <label for="id_password2" class="form-label">
+                        <i class="bi bi-lock-fill"></i>
+                        Confirmar Senha *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </span>
+                        <input 
+                            type="password" 
+                            class="form-control {% if form.password2.errors %}is-invalid{% endif %}" 
+                            id="id_password2" 
+                            name="password2" 
+                            placeholder="Digite a senha novamente" 
+                            required
+                        >
+                        <button type="button" class="password-toggle" id="togglePassword2">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password2.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email (OPCIONAL) -->
+                <div class="mb-3">
+                    <label for="id_email" class="form-label">
+                        <i class="bi bi-envelope"></i>
+                        Email (Opcional)
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope-fill"></i>
+                        </span>
+                        <input 
+                            type="email" 
+                            class="form-control" 
+                            id="id_email" 
+                            name="email" 
+                            placeholder="seu@email.com"
+                            value="{{ form.email.value|default:'' }}"
+                        >
+                    </div>
+                </div>
+
+                <!-- Termos de Uso -->
+                <div class="terms-container">
+                    <div class="form-check">
+                        <input 
+                            type="checkbox" 
+                            class="form-check-input" 
+                            id="terms" 
+                            name="terms_accepted" 
+                            required
+                        >
+                        <label class="form-check-label" for="terms">
+                            Eu li e aceito os <a href="/termos/" target="_blank">Termos de Uso</a> e a 
+                            <a href="/privacidade/" target="_blank">Política de Privacidade</a>
+                        </label>
+                    </div>
+                    <div class="invalid-feedback" id="termsError"></div>
+                </div>
+
+                <!-- Botão de Cadastro -->
+                <button type="submit" class="btn-login" id="btnCadastro">
+                    <span id="btnText">
+                        <i class="bi bi-person-plus"></i>
+                        Criar Conta
+                    </span>
+                    <span id="btnLoading" style="display: none;">
+                        <span class="spinner-login"></span>
+                        Criando conta...
+                    </span>
+                </button>
+
+                <!-- Link para Login -->
+                <div class="signup-link">
+                    Já tem uma conta? <a href="{% url 'login' %}">Faça login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript -->
+    <script>
+        // Elementos do DOM
+        const form = document.querySelector('form');
+        const usernameInput = document.getElementById('id_username');
+        const password1Input = document.getElementById('id_password1');
+        const password2Input = document.getElementById('id_password2');
+        const termsCheckbox = document.getElementById('terms');
+        const btnCadastro = document.getElementById('btnCadastro');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const steps = document.querySelectorAll('.signup-step');
+
+        // Toggle Senha
+        document.getElementById('togglePassword1').addEventListener('click', function() {
+            const input = password1Input;
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+
+        document.getElementById('togglePassword2').addEventListener('click', function() {
+            const input = password2Input;
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+
+        // Indicador de Força da Senha
+        password1Input.addEventListener('input', function() {
+            const password = this.value;
+            const strengthText = document.getElementById('strengthText');
+            const strengthBar = document.getElementById('strengthBar');
+            
+            strengthBar.className = 'password-strength-progress';
+            
+            if (password.length === 0) {
+                strengthText.textContent = 'Digite uma senha';
+                return;
+            }
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            if (strength <= 2) {
+                strengthBar.classList.add('weak');
+                strengthText.textContent = 'Senha fraca';
+                strengthText.style.color = '#dc3545';
+            } else if (strength <= 4) {
+                strengthBar.classList.add('medium');
+                strengthText.textContent = 'Senha média';
+                strengthText.style.color = '#ffc107';
+            } else {
+                strengthBar.classList.add('strong');
+                strengthText.textContent = 'Senha forte';
+                strengthText.style.color = '#28a745';
+            }
+
+            updateProgress();
+        });
+
+        // Validação de Confirmação de Senha
+        password2Input.addEventListener('input', function() {
+            const passwordConfirmError = document.getElementById('passwordConfirmError');
+            
+            if (this.value.length > 0) {
+                if (this.value !== password1Input.value) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                }
+            }
+            updateProgress();
+        });
+
+        // Atualizar Barra de Progresso
+        function updateProgress() {
+            let currentStep = 0;
+            
+            // Etapa 1: Dados básicos
+            if (usernameInput.value.trim().length >= 3) {
+                currentStep = 1;
+            }
+            
+            // Etapa 2: Senha válida
+            if (currentStep === 1 && password1Input.value.length >= 8) {
+                currentStep = 2;
+            }
+            
+            // Etapa 3: Confirmação e termos
+            if (currentStep === 2 && 
+                password2Input.value === password1Input.value && 
+                termsCheckbox.checked) {
+                currentStep = 3;
+            }
+            
+            // Atualizar visual dos steps
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < currentStep) {
+                    step.classList.add('completed');
+                } else if (index === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        // Atualizar progresso ao preencher campos
+        usernameInput.addEventListener('input', updateProgress);
+        password1Input.addEventListener('input', updateProgress);
+        password2Input.addEventListener('input', updateProgress);
+        termsCheckbox.addEventListener('change', updateProgress);
+
+        // Validação e Envio do Formulário
+        form.addEventListener('submit', function(e) {
+            // Validação básica do cliente
+            if (password1Input.value !== password2Input.value) {
+                e.preventDefault();
+                alert('As senhas não coincidem!');
+                return;
+            }
+            
+            if (!termsCheckbox.checked) {
+                e.preventDefault();
+                alert('Você deve aceitar os termos de uso!');
+                return;
+            }
+            
+            // Mostrar loading
+            btnCadastro.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-flex';
+        });
+    </script>
+</body>
+</html>
