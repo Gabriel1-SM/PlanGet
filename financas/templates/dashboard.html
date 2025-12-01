@@ -1503,7 +1503,7 @@
             </section>
 
             <!-- Gráficos -->
-            <section class="charts-section">
+            <!-- <section class="charts-section">
                 <div class="chart-container">
                     <div class="chart-header">
                         <h3 class="chart-title">Receitas vs Despesas</h3>
@@ -1541,7 +1541,7 @@
                         <canvas id="expenseCategoryChart"></canvas>
                     </div>
                 </div>
-            </section>
+            </section> -->
 
             <!-- Conteúdo Principal -->
             <div class="content-wrapper">
@@ -1852,88 +1852,88 @@
             });
 
             // Gráfico de Receitas vs Despesas
-            const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
-            const incomeExpenseChart = new Chart(incomeExpenseCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'],
-                    datasets: [
-                        {
-                            label: 'Receitas',
-                            data: [3200, 2900, 3500, 3800, 3300, 3500],
-                            backgroundColor: '#4cc9f0',
-                            borderColor: '#4cc9f0',
-                            borderWidth: 0
-                        },
-                        {
-                            label: 'Despesas',
-                            data: [2100, 2300, 2500, 2200, 2400, 2150],
-                            backgroundColor: '#f72585',
-                            borderColor: '#f72585',
-                            borderWidth: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            // const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+            // const incomeExpenseChart = new Chart(incomeExpenseCtx, {
+            //     type: 'bar',
+            //     data: {
+            //         labels: ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'],
+            //         datasets: [
+            //             {
+            //                 label: 'Receitas',
+            //                 data: [3200, 2900, 3500, 3800, 3300, 3500],
+            //                 backgroundColor: '#4cc9f0',
+            //                 borderColor: '#4cc9f0',
+            //                 borderWidth: 0
+            //             },
+            //             {
+            //                 label: 'Despesas',
+            //                 data: [2100, 2300, 2500, 2200, 2400, 2150],
+            //                 backgroundColor: '#f72585',
+            //                 borderColor: '#f72585',
+            //                 borderWidth: 0
+            //             }
+            //         ]
+            //     },
+            //     options: {
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         plugins: {
+            //             legend: {
+            //                 position: 'top',
+            //             },
+            //             tooltip: {
+            //                 mode: 'index',
+            //                 intersect: false
+            //             }
+            //         },
+            //         scales: {
+            //             x: {
+            //                 grid: {
+            //                     display: false
+            //                 }
+            //             },
+            //             y: {
+            //                 beginAtZero: true,
+            //                 ticks: {
+            //                     callback: function(value) {
+            //                         return 'R$ ' + value.toLocaleString('pt-BR');
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // });
 
-            // Gráfico de Pizza - Despesas por Categoria
-            const expenseCategoryCtx = document.getElementById('expenseCategoryChart').getContext('2d');
-            const expenseCategoryChart = new Chart(expenseCategoryCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Lazer', 'Outros'],
-                    datasets: [{
-                        data: [1200, 350, 280, 90, 150, 80],
-                        backgroundColor: [
-                            '#4361ee',
-                            '#4cc9f0',
-                            '#7209b7',
-                            '#f8961e',
-                            '#f72585',
-                            '#4895ef'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
+            // // Gráfico de Pizza - Despesas por Categoria
+            // const expenseCategoryCtx = document.getElementById('expenseCategoryChart').getContext('2d');
+            // const expenseCategoryChart = new Chart(expenseCategoryCtx, {
+            //     type: 'doughnut',
+            //     data: {
+            //         labels: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Lazer', 'Outros'],
+            //         datasets: [{
+            //             data: [1200, 350, 280, 90, 150, 80],
+            //             backgroundColor: [
+            //                 '#4361ee',
+            //                 '#4cc9f0',
+            //                 '#7209b7',
+            //                 '#f8961e',
+            //                 '#f72585',
+            //                 '#4895ef'
+            //             ],
+            //             borderWidth: 0
+            //         }]
+            //     },
+            //     options: {
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         plugins: {
+            //             legend: {
+            //                 position: 'bottom'
+            //             }
+            //         },
+            //         cutout: '65%'
+            //     }
+            // });
 
             // Filtro de transações
             const filterButtons = document.querySelectorAll('input[name="transactionFilter"]');
